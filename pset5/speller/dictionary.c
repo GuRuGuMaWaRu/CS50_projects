@@ -58,10 +58,41 @@ void preset_to_null(node *new_node)
  */
 bool check(const char *word)
 {
+    // check input argument
+    if (word == NULL)
+    {
+        fprintf(stderr, "Check function received NULL instead of a word!\n");
+    }
+
+    // set cursor pointer that will always point at current position in our tie structure
+    node *cursor = root;
+    // set helper variables
+    char current_char;
+    int char_position;
+
     for (int i = 0, len = strlen(word); i < len; i++)
     {
+        // initialize helper variables
+        current_char = word[i];
+        char_position = get_alphabet_position(current_char);
 
+        // there is no such character hence there is no such word in our dictionary
+        if (cursor->children[char_position] == NULL)
+        {
+            return false;
+        }
+
+        // we found current character and move on to the next one
+        cursor = cursor->children[char_position];
     }
+
+    // check if the word we found exists in our dictionary
+    if (cursor->is_word)
+    {
+        return true;
+    }
+
+    // there is no such word in our dictionary
     return false;
 }
 
