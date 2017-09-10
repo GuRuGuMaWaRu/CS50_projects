@@ -1,0 +1,11 @@
+0. TODO
+3x3, 5x5, 6x6, 7x7, 8x8, 9x9
+
+1. TODO
+array
+
+2. TODO
+greet
+
+3. TODO
+init, draw, move, won
