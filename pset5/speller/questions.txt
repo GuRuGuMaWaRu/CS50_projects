@@ -1,0 +1,30 @@
+0.  What is pneumonoultramicroscopicsilicovolcanoconiosis?
+
+It's the longest word in Englihh dictionary.
+
+1.  According to its man page, what does getrusage do?
+
+It measures resource usage.
+
+2.  Per that same man page, how many members are in a variable of type struct rusage?
+
+There are 16 variables.
+
+3.  Why do you think we pass before and after by reference (instead of by value) to calculate, even though we’re not changing their contents?
+
+We do it to save time and memory.
+
+4.  Explain as precisely as possible, in a paragraph or more, how main goes about reading words from a file. In other words, convince us that you indeed understand how that function’s for loop works.
+
+We read text one character at a time - if the character is a letter or an apostrophe (that does not begin a word), we add it to the word we currently build.
+If while reading characters we encounter a digit, we skip this word. If the character we reached is neither a letter (or apostrophe) nor a digit, and judging by the index variable
+we can assume that we already built a word of some length, we finish building the current word and start building the next one.
+
+5.  Why do you think we used fgetc to read each word’s characters one at a time rather than use fscanf with a format string like "%s" to read whole words at a time? Put another way, what problems might arise by relying on fscanf alone?
+
+fscanf separates words by a whitespace, but our text file also includes punctuation marks, which fscanf will treat as part of words.
+Besides, with fscanf there is no easy protection against extremely long words, that could cause problems if read.
+
+6.  Why do you think we declared the parameters for check and load as const (which means "constant")?
+
+We did this to prevent accidental changes to these parameters.
