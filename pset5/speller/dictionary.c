@@ -10,7 +10,6 @@
 
 #include "dictionary.h"
 
-// define struct node
 /**
  * NODE
  *
@@ -25,11 +24,11 @@ typedef struct node
 }
 node;
 
-// define root (first) node
 node *root = NULL;
+unsigned int counter = 0;
 
 /**
- * Returns alphabet position for a character (including apostrophe)
+ * Helper function - returns alphabet position for a given character (including apostrophe)
  */
 int get_alphabet_position(const char character)
 {
@@ -45,10 +44,12 @@ int get_alphabet_position(const char character)
 }
 
 /**
- * Presets new node children to NULL
+ * Helper function - presets new node children to NULL
  */
 void preset_to_null(node *new_node)
 {
+    new_node->is_word = false;
+
     for (int i = 0; i < 27; i++)
         new_node->children[i] = NULL;
 }
@@ -165,16 +166,40 @@ bool load(const char *dictionary)
 }
 
 /**
+ * Size function helper
+ */
+
+void size_helper(node *current_node)
+{
+    if (current_node->is_word)
+        counter += 1;
+
+    for (int i = 0; i < 27; i++)
+    {
+        if (current_node->children[i] != NULL)
+            size_helper(current_node->children[i]);
+    }
+}
+
+/**
  * Returns number of words in dictionary if loaded else 0 if not yet loaded.
  */
 unsigned int size(void)
 {
-    // TODO
-    return 0;
+    // check if dictionary is loaded
+    if (root == NULL)
+    {
+        fprintf(stderr, "Dictionary is not loaded!\n");
+        return 0;
+    }
+
+    size_helper(root);
+
+    return counter;
 }
 
 /**
- * Unload helper
+ * Unload function helper
  */
 bool unload_helper(node *current_node)
 {
