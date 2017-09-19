@@ -13,13 +13,35 @@ def main():
         return 2
 
     # prepare variables
-    string_keyword = sys.argv[1]
-    keyword_length = len(string_keyword)
+    keyword = sys.argv[1]
+    keyword_length = len(keyword)
+
+    # prepare a container for enciphered text
+    enciphered_text = ""
+
+    # create a counter to iterate through keyword characters
+    keyword_counter = 0
 
     # get plaintext
     print("plaintext: ", end="");
     plain_text = cs50.get_string()
     plain_text_length = len(plain_text)
+
+    # encipher text
+    for character in plain_text:
+        if (character.isalpha()):
+            plain_text_range_start = 65 if character.isupper() else 97
+            keyword_character = keyword[keyword_counter % keyword_length]
+            counter = ord(keyword_character) - (65 if keyword_character.isupper() else 97)
+
+            enciphered_text += chr(((ord(character) - plain_text_range_start + counter) % 26) + plain_text_range_start)
+
+            keyword_counter += 1
+        else:
+            enciphered_text += character
+
+    # print enciphered text
+    print("ciphertext: {}".format(enciphered_text))
 
 if __name__ == "__main__":
     main()
