@@ -7,7 +7,6 @@ from analyzer import Analyzer
 from termcolor import colored
 
 def main():
-
     # ensure proper usage
     if len(sys.argv) != 2:
         sys.exit("Usage: ./smile word")
