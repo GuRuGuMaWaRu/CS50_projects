@@ -14,14 +14,13 @@ def index():
 
 @app.route("/search")
 def search():
-
     # validate screen_name
     screen_name = request.args.get("screen_name", "")
     if not screen_name:
         return redirect(url_for("index"))
 
     # get screen_name's tweets
-    tweets = helpers.get_user_timeline(screen_name)
+    tweets = helpers.get_user_timeline(screen_name, 100)
     if tweets == None:
         return redirect(url_for("index"))
 
