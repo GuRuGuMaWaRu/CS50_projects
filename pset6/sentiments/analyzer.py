@@ -5,7 +5,7 @@ class Analyzer():
 
     def __init__(self, positives, negatives):
         """Initialize Analyzer."""
-        
+
         # declare sets for positive and negative words
         self.positives = set()
         self.negatives = set()
@@ -16,11 +16,15 @@ class Analyzer():
                 if not line.startswith(";") and not line.startswith(" "):
                     self.positives.add(line.strip())
 
+        lines.close()
+
         # load negative words
         with open(negatives) as lines:
             for line in lines:
                 if not line.startswith(";") and not line.startswith(" "):
                     self.negatives.add(line.strip())
+
+        lines.close()
 
         self.tokenizer = nltk.tokenize.TweetTokenizer()
         self.score = 0
