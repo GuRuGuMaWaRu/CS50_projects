@@ -121,12 +121,20 @@ def register():
         if request.form.get("password") != request.form.get("password_confirmation"):
             return apology("password confirmation must be the same as password")
 
+        # hash password
+        hashed_password = pwd_context.hash(request.form.get("password"))
+
+        # add username and password to the database
+        result = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)", username=request.form.get("username"), hash=hashed_password)
+
         # ensure the provided username is not already taken
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
-        if len(rows) > 0:
+        if not result:
             return apology("this username is already taken")
 
-        #redirect user to home page
+        # remember user
+        session["user_id"] = result
+
+        # redirect user to home page
         return redirect(url_for("index"))
 
     # if user reached route via GET (as by clicking a link or via redirect)
