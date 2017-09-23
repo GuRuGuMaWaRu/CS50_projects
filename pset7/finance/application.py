@@ -101,6 +101,20 @@ def quote():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user."""
+    
+    # if user reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username")
+
+        #redirect user to home page
+        return redirect(url_for("index"))
+
+    # if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("register.html")
     return apology("TODO")
 
 @app.route("/sell", methods=["GET", "POST"])
