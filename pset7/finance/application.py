@@ -121,6 +121,11 @@ def register():
         if request.form.get("password") != request.form.get("password_confirmation"):
             return apology("password confirmation must be the same as password")
 
+        # ensure the provided username is not already taken
+        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        if len(rows) > 0:
+            return apology("this username is already taken")
+
         #redirect user to home page
         return redirect(url_for("index"))
 
