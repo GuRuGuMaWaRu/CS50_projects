@@ -108,7 +108,7 @@ def register():
         # ensure username was submitted
         if not request.form.get("username"):
             return apology("must provide username")
-        
+
         # ensure password was submitted
         if not request.form.get("password"):
             return apology("must provide password")
@@ -116,6 +116,10 @@ def register():
         # ensure password confirmation was submitted
         if not request.form.get("password_confirmation"):
             return apology("must provide password confirmation")
+
+        # ensure password confirmation is the same as password
+        if request.form.get("password") != request.form.get("password_confirmation"):
+            return apology("password confirmation must be the same as password")
 
         #redirect user to home page
         return redirect(url_for("index"))
