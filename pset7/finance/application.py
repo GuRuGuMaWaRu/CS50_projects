@@ -33,6 +33,14 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
+    """Show current user's statistics"""
+
+    # get current user information
+    user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+
+    # get grouped transactions
+    transactions = db.execute("SELECT user, stock_symbol, SUM(shares) FROM transactions GROUP BY stock_symbol ORDER BY user")
+
     return apology("TODO")
 
 @app.route("/buy", methods=["GET", "POST"])
