@@ -96,7 +96,27 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-    return apology("TODO")
+
+    # if user reached route via POST (as by submitting a quote via POST)
+    if request.method == "POST":
+        
+        # ensure stock symbol was submitted
+        if not request.form.get("stock_symbol"):
+            return apology("must provide stock symbol")
+        
+        # get stock data
+        stock_data = lookup(request.form.get("stock_symbol"))
+        
+        # check returned stock data and show "apology" page if there is a mistake
+        if not stock_data:
+            return apology("there was an error with your request")
+        
+        # display "quoted" page with stock data
+        return render_template("quoted.html", data=stock_data)
+
+    # if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("quote.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
