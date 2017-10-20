@@ -39,8 +39,56 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock."""
-    return apology("TODO")
 
+    # if user reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        
+        # ensure stock symbol was submitted
+        if not request.form.get("stock_symbol"):
+            return apology("must provide stock symbol")
+        
+        # ensure number of shares was submitted
+        if not request.form.get("shares_number"):
+            return apology("must provide number of shares")
+        
+        # save number of shares in a variable
+        shares = int(request.form.get("shares_number"))
+
+        # ensure number of shares is higher than zero
+        if shares < 1:
+            return apology("must buy more than zero shares")
+        
+        # get stock data
+        stock_data = lookup(request.form.get("stock_symbol"))
+
+        # check returned stock data and show "apology" page if there is a mistake
+        if not stock_data:
+            return apology("there was an error with your request")
+            
+        # make money calculations
+        stock_price = stock_data["price"] * shares
+        user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+        user_cash = user[0]["cash"]
+        cash_left = user_cash - stock_price
+        
+        # check if user has enough money to buy the required number of shares
+        if cash_left < 0:
+            return apology("{} stocks cost {}, you have {}".format(shares, stock_price, user_cash))
+        
+        # save purchased stock
+        today = datetime.now();
+        db.execute("INSERT INTO transactions (user, stock_symbol, shares, purchase_date) VALUES(:user, :stock_symbol, :shares, :purchase_date)", user=user[0]["username"], stock_symbol=stock_data["symbol"], shares=shares, purchase_date=today)
+
+        # update user's cash after purchase 
+        db.execute("UPDATE users SET cash = :cash_left WHERE id = :id", cash_left=cash_left, id=session["user_id"])
+
+        # after a successful purchase redirect user to index page
+        return render_template("index.html")
+
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("buy.html")
+    
 @app.route("/history")
 @login_required
 def history():
