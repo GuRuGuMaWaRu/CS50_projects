@@ -3,6 +3,7 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 from flask_session import Session
 from passlib.apps import custom_app_context as pwd_context
 from tempfile import mkdtemp
+from datetime import datetime
 
 from helpers import *
 
@@ -34,12 +35,14 @@ db = SQL("sqlite:///finance.db")
 @login_required
 def index():
     """Show current user's statistics"""
-
+    
     # get current user information
     user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
 
     # get grouped transactions
-    transactions = db.execute("SELECT user, stock_symbol, SUM(shares) FROM transactions GROUP BY stock_symbol ORDER BY user")
+    transactions = db.execute("SELECT username, stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
+
+
 
     return apology("TODO")
 
@@ -47,7 +50,7 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock."""
-
+    
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         
@@ -85,7 +88,7 @@ def buy():
         
         # save purchased stock
         today = datetime.now();
-        db.execute("INSERT INTO transactions (user, stock_symbol, shares, purchase_date) VALUES(:user, :stock_symbol, :shares, :purchase_date)", user=user[0]["username"], stock_symbol=stock_data["symbol"], shares=shares, purchase_date=today)
+        db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date) VALUES(:username, :stock_symbol, :shares, :purchase_date)", username=user[0]["username"], stock_symbol=stock_data["symbol"], shares=shares, purchase_date=today)
 
         # update user's cash after purchase 
         db.execute("UPDATE users SET cash = :cash_left WHERE id = :id", cash_left=cash_left, id=session["user_id"])
@@ -96,7 +99,7 @@ def buy():
     # else if user reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("buy.html")
-    
+        
 @app.route("/history")
 @login_required
 def history():
@@ -152,7 +155,7 @@ def logout():
 @login_required
 def quote():
     """Get stock quote."""
-
+    
     # if user reached route via POST (as by submitting a quote via POST)
     if request.method == "POST":
         
@@ -177,42 +180,42 @@ def quote():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user."""
-
+    
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-
+        
         # ensure username was submitted
         if not request.form.get("username"):
             return apology("must provide username")
-
+        
         # ensure password was submitted
         if not request.form.get("password"):
             return apology("must provide password")
-
+            
         # ensure password confirmation was submitted
         if not request.form.get("password_confirmation"):
             return apology("must provide password confirmation")
-
+        
         # ensure password confirmation is the same as password
         if request.form.get("password") != request.form.get("password_confirmation"):
             return apology("password confirmation must be the same as password")
-
+        
         # hash password
         hashed_password = pwd_context.hash(request.form.get("password"))
-
+        
         # add username and password to the database
         result = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)", username=request.form.get("username"), hash=hashed_password)
-
+        
         # ensure the provided username is not already taken
         if not result:
             return apology("this username is already taken")
-
+        
         # remember user
         session["user_id"] = result
-
+            
         # redirect user to home page
         return redirect(url_for("index"))
-
+        
     # if user reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
