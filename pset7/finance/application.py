@@ -42,9 +42,19 @@ def index():
     # get grouped transactions
     transactions = db.execute("SELECT username, stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
 
-
-
-    return apology("TODO")
+    # prepare data for display
+    data = []
+    total_shares_price = 0
+    
+    for transaction in transactions:
+        stock_data = lookup(transaction["stock_symbol"])
+        shares = transaction["SUM(shares)"]
+        price = stock_data["price"]
+        total_shares_price = total_shares_price + (shares * price)
+        
+        data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": (shares * price)})
+        
+    return render_template("index.html", data=data, username=user[0]["username"], cash=user[0]["cash"], total_shares_price=total_shares_price)
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
