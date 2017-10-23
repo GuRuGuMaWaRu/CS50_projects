@@ -19,7 +19,7 @@
         <tr>
             <td>{{ datum["symbol"] }}</td>
             <td>{{ datum["name"] }}</td>
-            <td>{{ datum["SUM(shares)"] }}</td>
+            <td>{{ datum["shares"] }}</td>
             <td>{{ datum["price"] }}</td>
             <td>{{ datum["total"] }}</td>
         </tr>
@@ -30,7 +30,7 @@
         </tr>
         <tr>
             <td colspan="4">GRAND TOTAL</td>
-            <td>{{ cash + total_shares_price }}</td>
+            <td>{{ grand_total }}</td>
         </tr>
     </table>
 

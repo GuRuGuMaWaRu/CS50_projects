@@ -49,12 +49,12 @@ def index():
     for transaction in transactions:
         stock_data = lookup(transaction["stock_symbol"])
         shares = transaction["SUM(shares)"]
-        price = stock_data["price"]
+        price = round(stock_data["price"], 2)
         total_shares_price = total_shares_price + (shares * price)
         
-        data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": (shares * price)})
+        data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": round((shares * price), 2)})
         
-    return render_template("index.html", data=data, username=user[0]["username"], cash=user[0]["cash"], total_shares_price=total_shares_price)
+    return render_template("index.html", data=data, username=user[0]["username"], cash=user[0]["cash"], grand_total=round(user[0]["cash"] + total_shares_price, 2))
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
