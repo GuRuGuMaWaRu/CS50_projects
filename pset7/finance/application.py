@@ -234,4 +234,27 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock."""
-    return apology("TODO")
+
+    # if user reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        return redirect(url_for("index"))
+    
+    # if user reached route via GET (as by clicking a link or via redirect)
+    else:
+        # get current user information
+        user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+    
+        # get grouped transactions
+        transactions = db.execute("SELECT username, stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
+    
+        # prepare data for display
+        data = []
+
+        for transaction in transactions:
+            stock_data = lookup(transaction["stock_symbol"])
+            shares = transaction["SUM(shares)"]
+            price = round(stock_data["price"], 2)
+
+            data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price })
+            
+        return render_template("sell.html", data=data)
