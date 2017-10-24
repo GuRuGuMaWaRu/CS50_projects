@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sell
+{% endblock %}
+
+{% block main %}
+
+    <h3>Sell Shares</h3>
+    </br>
+    <form class="form-horizontal" action="{{ url_for('sell') }}" method="post">
+        
+        {% for share in shares %}
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{ share["symbol"] }} | {{ share["name"] }} ( {{ share["shares"] }} )</label>
+            <input class="form-control" name={{ share["symbol"] }} placeholder={{ share["shares"] }} type="number" autocomplete="off" min="0" max={{ share["shares"] }} />
+        </div>
+        {% endfor %}
+        
+        <div class="form-group">
+            <button class="btn btn-default" type="submit">Sell</button>
+        </div>
+    </form>
+    
+{% endblock %}
