@@ -1,25 +1,25 @@
 {% extends "layout.html" %}
 
 {% block title %}
-  Sell
+    Sell
 {% endblock %}
 
 {% block main %}
 
-  <h3>Sell Stocks</h3>
-  </br>
-  <form class="form-horizontal" action="{{ url_for('sell') }}" method="post">
-      
-      {% for datum in data %}
-      <div class="form-group">
-          <label class="col-sm-8 control-label">{{ datum["symbol"] }} | {{ datum["name"] }} (you have shares: {{ datum["shares"] }}; current price per share: {{ datum["price"] }} )</label>
-          <input class="col-sm-4 form-control" name={{ datum["symbol"] }} placeholder={{ datum["shares"] }} type="number" autocomplete="off" min="0" max={{ datum["shares"] }} />
-      </div>
-      {% endfor %}
-      
-      <div class="form-group">
-          <button class="btn btn-default" type="submit">Sell</button>
-      </div>
-  </form>
+    <h3>Sell Stocks</h3>
+    </br>
+    <form class="form-horizontal" action="{{ url_for('sell') }}" method="post">
+        
+        {% for datum in data %}
+        <div class="form-group">
+            <label class="col-sm-7 control-label">{{ datum["symbol"] }} | {{ datum["name"] }} (shares: {{ datum["shares"] }}; price: {{ datum["price"] }} )</label>
+            <input class="col-sm-5 form-control" name={{ datum["symbol"] }} placeholder={{ datum["shares"] }} type="number" autocomplete="off" min="0" max={{ datum["shares"] }} />
+        </div>
+        {% endfor %}
+        
+        <div class="form-group">
+            <button class="btn btn-default" type="submit">Sell</button>
+        </div>
+    </form>
     
 {% endblock %}
