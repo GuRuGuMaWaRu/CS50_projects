@@ -54,7 +54,7 @@ def index():
         
         data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": round((shares * price), 2)})
         
-    return render_template("index.html", data=data, username=user[0]["username"], cash=user[0]["cash"], grand_total=round(user[0]["cash"] + total_shares_price, 2))
+    return render_template("index.html", data=data, username=user[0]["username"], cash=round(user[0]["cash"], 2), grand_total=round(user[0]["cash"] + total_shares_price, 2))
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
