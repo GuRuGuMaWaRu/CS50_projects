@@ -237,6 +237,31 @@ def sell():
 
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
+        # get stock symbols from submitted form
+        stock_symbols = request.form
+        
+        # get current cash from user account
+        user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+        current_cash = user[0]["cash"]
+
+        received_cash = 0
+
+        for stock_symbol in stock_symbols:
+            # get number of sold shares
+            sold_shares = int(request.form.get(stock_symbol))
+            
+            if sold_shares > 0:
+                # calculate how much cash user receives for the sold shares
+                stock_data = lookup(stock_symbol)
+                received_cash = received_cash + (stock_data["price"] * sold_shares)
+                # add sale transaction
+                today = datetime.now();
+                db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date) VALUES(:username, :stock_symbol, :shares, :purchase_date)", username=user[0]["username"], stock_symbol=stock_symbol, shares=(sold_shares * -1), purchase_date=today)
+
+        if received_cash > 0:
+            # update cash in user account
+            db.execute("UPDATE users SET cash = :new_cash WHERE id = :id", new_cash=(current_cash + received_cash), id=session["user_id"])
+
         return redirect(url_for("index"))
     
     # if user reached route via GET (as by clicking a link or via redirect)
