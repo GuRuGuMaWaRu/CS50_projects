@@ -115,7 +115,20 @@ def buy():
 @login_required
 def history():
     """Show history of transactions."""
-    return apology("TODO")
+    
+    # get current user information
+    user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+
+    # get transactions
+    transactions = db.execute("SELECT stock_symbol, shares, purchase_date, price FROM transactions WHERE username = :username ORDER BY purchase_date DESC", username=user[0]["username"])
+
+    # prepare data for display
+    data = []
+
+    for transaction in transactions:
+        data.append({"symbol": transaction["stock_symbol"], "price": transaction["price"], "shares": transaction["shares"], "date": transaction["purchase_date"]})
+        
+    return render_template("history.html", data=data, username=user[0]["username"])
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

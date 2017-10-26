@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <h3>{{ username }}'s History</h3>
+    </br>
+    <table class="table table-striped">
+        <thead>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th>Shares</th>
+            <th>Date</th>
+        </thead>
+        {% for datum in data %}
+        <tr>
+            <td>{{ datum["symbol"] }}</td>
+            <td>{{ datum["price"] }}</td>
+            <td>{{ datum["shares"] }}</td>
+            <td>{{ datum["date"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}
