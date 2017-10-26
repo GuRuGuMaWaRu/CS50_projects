@@ -99,7 +99,7 @@ def buy():
         
         # save purchased stock
         today = datetime.now();
-        db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date) VALUES(:username, :stock_symbol, :shares, :purchase_date)", username=user[0]["username"], stock_symbol=stock_data["symbol"], shares=shares, purchase_date=today)
+        db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date, price) VALUES(:username, :stock_symbol, :shares, :purchase_date, :price)", username=user[0]["username"], stock_symbol=stock_data["symbol"], shares=shares, purchase_date=today, price=(stock_price * -1))
 
         # update user's cash after purchase 
         db.execute("UPDATE users SET cash = :cash_left WHERE id = :id", cash_left=cash_left, id=session["user_id"])
@@ -257,7 +257,7 @@ def sell():
                 received_cash = received_cash + (stock_data["price"] * sold_shares)
                 # add sale transaction
                 today = datetime.now();
-                db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date) VALUES(:username, :stock_symbol, :shares, :purchase_date)", username=user[0]["username"], stock_symbol=stock_symbol, shares=(sold_shares * -1), purchase_date=today)
+                db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date, price) VALUES(:username, :stock_symbol, :shares, :purchase_date, :price)", username=user[0]["username"], stock_symbol=stock_symbol, shares=(sold_shares * -1), purchase_date=today, price=(stock_data["price"] * sold_shares))
 
         if received_cash > 0:
             # update cash in user account
