@@ -52,7 +52,8 @@ def index():
         price = round(stock_data["price"], 2)
         total_shares_price = total_shares_price + (shares * price)
         
-        data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": round((shares * price), 2)})
+        if shares > 0:
+            data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": round((shares * price), 2)})
         
     return render_template("index.html", data=data, username=user[0]["username"], cash=round(user[0]["cash"], 2), grand_total=round(user[0]["cash"] + total_shares_price, 2))
 
@@ -94,7 +95,7 @@ def buy():
         
         # check if user has enough money to buy the required number of shares
         if cash_left < 0:
-            return apology("{} stocks cost {}, you have {}".format(shares, stock_price, user_cash))
+            return apology("{} stocks cost {}, you have {}".format(shares, round(stock_price, 2), round(user_cash, 2)))
         
         # save purchased stock
         today = datetime.now();
@@ -104,7 +105,7 @@ def buy():
         db.execute("UPDATE users SET cash = :cash_left WHERE id = :id", cash_left=cash_left, id=session["user_id"])
 
         # after a successful purchase redirect user to index page
-        return render_template("index.html")
+        return redirect(url_for("index"))
 
     # else if user reached route via GET (as by clicking a link or via redirect)
     else:
@@ -234,7 +235,7 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock."""
-
+    
     # if user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         # get stock symbols from submitted form
@@ -270,7 +271,7 @@ def sell():
         user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
     
         # get grouped transactions
-        transactions = db.execute("SELECT username, stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
+        transactions = db.execute("SELECT stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
     
         # prepare data for display
         data = []
@@ -280,6 +281,7 @@ def sell():
             shares = transaction["SUM(shares)"]
             price = round(stock_data["price"], 2)
 
-            data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price })
+            if shares > 0:
+                data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price })
             
         return render_template("sell.html", data=data)
