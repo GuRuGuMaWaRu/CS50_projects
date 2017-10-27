@@ -24,7 +24,7 @@
                 <td>{{ datum["price"] }}</td>
                 <td>{{ datum["total"] }}</td>
                 <td class="form-group">
-                    <input class="form-control" id={{ datum["symbol"] }} type="number" value="0" min="0" />
+                    <input class="form-control" name={{ datum["symbol"] }} type="number" autocomplete="off" value="0" min="0" />
                 </td>
             </tr>
             {% endfor %}
