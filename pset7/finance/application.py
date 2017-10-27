@@ -31,31 +31,65 @@ Session(app)
 # configure CS50 Library to use SQLite database
 db = SQL("sqlite:///finance.db")
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
     """Show current user's statistics"""
     
-    # get current user information
-    user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+    # if user reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        # get stock symbols from submitted form
+        stock_symbols = request.form
+        print("stock_symbols: {}".format(stock_symbols))
+        
+        for stock_symbol in stock_symbols:
+            # get number of bought shares
+            bought_shares = int(request.form.get(stock_symbol))
+            
+            if bought_shares > 0:
+                # get user cash
+                user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+                current_cash = user[0]["cash"]
 
-    # get grouped transactions
-    transactions = db.execute("SELECT username, stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
+                # calculate shares cost
+                stock_data = lookup(stock_symbol)
+                needed_cash = stock_data["price"] * bought_shares
 
-    # prepare data for display
-    data = []
-    total_shares_price = 0
+                # show apology screen if user doesn't have enough cash        
+                if needed_cash > current_cash:
+                    return apology("Sorry, but you don't have enough cash")
+                    
+                # add purchase transaction
+                today = datetime.now();
+                db.execute("INSERT INTO transactions (username, stock_symbol, shares, purchase_date, price) VALUES(:username, :stock_symbol, :shares, :purchase_date, :price)", username=user[0]["username"], stock_symbol=stock_symbol, shares=bought_shares, purchase_date=today, price=((stock_data["price"] * bought_shares) * -1))
+
+                # update user cash
+                db.execute("UPDATE users SET cash = :new_cash WHERE id = :id", new_cash=(current_cash - needed_cash), id=session["user_id"])
+
+        return redirect(url_for("index"))
     
-    for transaction in transactions:
-        stock_data = lookup(transaction["stock_symbol"])
-        shares = transaction["SUM(shares)"]
-        price = round(stock_data["price"], 2)
-        total_shares_price = total_shares_price + (shares * price)
-        
-        if shares > 0:
-            data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": round((shares * price), 2)})
-        
-    return render_template("index.html", data=data, username=user[0]["username"], cash=round(user[0]["cash"], 2), grand_total=round(user[0]["cash"] + total_shares_price, 2))
+    # else if user reached route via GET (as by clicking a link or via redirect)
+    else:  
+        # get current user information
+        user = db.execute("SELECT * FROM users WHERE id = :id", id=session["user_id"])
+    
+        # get grouped transactions
+        transactions = db.execute("SELECT username, stock_symbol, SUM(shares) FROM transactions WHERE username = :username GROUP BY stock_symbol ORDER BY stock_symbol", username=user[0]["username"])
+    
+        # prepare data for display
+        data = []
+        total_shares_price = 0
+    
+        for transaction in transactions:
+            stock_data = lookup(transaction["stock_symbol"])
+            shares = transaction["SUM(shares)"]
+            price = round(stock_data["price"], 2)
+            total_shares_price = total_shares_price + (shares * price)
+            
+            if shares > 0:
+                data.append({"symbol": transaction["stock_symbol"], "name": stock_data["name"], "shares": shares, "price": price, "total": round((shares * price), 2)})
+            
+        return render_template("index.html", data=data, username=user[0]["username"], cash=round(user[0]["cash"], 2), grand_total=round(user[0]["cash"] + total_shares_price, 2))
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
