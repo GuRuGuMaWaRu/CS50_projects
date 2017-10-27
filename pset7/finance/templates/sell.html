@@ -12,7 +12,7 @@
         
         {% for datum in data %}
         <div class="form-group">
-            <label class="col-sm-7 control-label">{{ datum["symbol"] }} | {{ datum["name"] }} (shares: {{ datum["shares"] }}; price: {{ datum["price"] }} )</label>
+atum["symbol"] }} | {{ datum["name"] }} (shares: {{ datum["shares"] }}; price: {{ datum["price"] }} )</label>            <label class="col-sm-7 control-label">{{ d
             <input class="col-sm-5 form-control" name={{ datum["symbol"] }} placeholder={{ datum["shares"] }} value="0" type="number" autocomplete="off" min="0" max={{ datum["shares"] }} />
         </div>
         {% endfor %}
