@@ -34,6 +34,11 @@ def articles():
     """Look up articles for geo."""
 
     # TODO
+    
+    # ensure parameter is present
+    if not request.args.get("geo"):
+        raise RuntimeError("missing geo")
+    
     return jsonify([])
 
 @app.route("/search")
