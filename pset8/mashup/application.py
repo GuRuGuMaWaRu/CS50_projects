@@ -33,13 +33,15 @@ def index():
 def articles():
     """Look up articles for geo."""
 
-    # TODO
-    
     # ensure parameter is present
     if not request.args.get("geo"):
         raise RuntimeError("missing geo")
     
-    return jsonify([])
+    # get articles using LOOKUP helper method
+    articles = lookup(request.args.get("geo"))
+    
+    # convert articles from RSS into JSON format and return
+    return jsonify(articles)
 
 @app.route("/search")
 def search():
