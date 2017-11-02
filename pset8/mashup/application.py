@@ -47,7 +47,22 @@ def articles():
 def search():
     """Search for places that match query."""
 
-    # TODO
+    # prepare DB query
+    q = request.args.get("q") + "%"
+
+    # split query by whitespace and/or coma into a list
+    split_q = re.split(r"\,?\s?", q)
+    print("splitted query: {}".format(split_q))
+    
+    # iterate over a list of queries and check what db column is found
+    ## if postal_code is found - store current list value in postal_code_query
+    ## if place_name is found - store current list value in city_query
+    ## if admin_name1 is found - store current list value in state_query
+    # depending on what queries we have - construct a db command to get what we need
+
+    # retrieve search results from PLACES database
+    results = db.execute("SELECT * FROM places WHERE postal_code LIKE :q OR place_name LIKE :q OR admin_name1 LIKE :q", q=q)
+    print("got some results: {}".format(results))
     return jsonify([])
 
 @app.route("/update")
