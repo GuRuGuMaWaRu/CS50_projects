@@ -63,8 +63,13 @@ $(function() {
  */
 function addMarker(place)
 {
-    // TODO
-}
+    var marker = new google.maps.Marker({
+        position: {lat: place.latitude, lng: place.longitude},
+        map: map,
+        title: place.name,
+        animation: google.maps.Animation.DROP
+     });
+ }
 
 /**
  * Configures application.
