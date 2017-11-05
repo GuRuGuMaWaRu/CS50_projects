@@ -99,7 +99,7 @@ function configure()
         templates: {
             suggestion: Handlebars.compile(
                 "<div>" +
-                "TODO" +
+                "<p>{{ suggestion.place_name }}, {{ suggestion.admin_name1 }}, {{ suggestion.postal_code }}</p>" +
                 "</div>"
             )
         }
