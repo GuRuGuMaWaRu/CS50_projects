@@ -63,12 +63,35 @@ $(function() {
  */
 function addMarker(place)
 {
+    var articles;
+    
     var marker = new google.maps.Marker({
-        position: {lat: place.latitude, lng: place.longitude},
-        map: map,
-        title: place.name,
-        animation: google.maps.Animation.DROP
-     });
+       position: {lat: place.latitude, lng: place.longitude},
+       map: map,
+       title: place.name,
+       animation: google.maps.Animation.DROP
+    });
+    
+    $.getJSON(Flask.url_for("articles"), {geo: place.postal_code})
+        .done(function(data, textStatus, jqXHR) {
+            for (var i = 0, len = data.length; i < len; i++)
+            {
+                articles += '<li><a target="blank" href="' + article.link + '">' + article.title + '</a></li>';
+            }
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // log error to browser's console
+            console.log(errorThrown.toString());
+        });
+
+    
+    var infowindow = new google.maps.InfoWindow({
+        content: "<ul>" + articles + "</ul>"
+    });
+  
+    marker.addListener('click', function() {
+        infowindow.open(map, marker);
+    });
  }
 
 /**
