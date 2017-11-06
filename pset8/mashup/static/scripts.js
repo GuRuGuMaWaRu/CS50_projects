@@ -63,20 +63,19 @@ $(function() {
  */
 function addMarker(place)
 {
-    var articles;
+    var articles = "";
     
     var marker = new google.maps.Marker({
        position: {lat: place.latitude, lng: place.longitude},
        map: map,
-       title: place.name,
-       animation: google.maps.Animation.DROP
+       title: place.name
     });
     
     $.getJSON(Flask.url_for("articles"), {geo: place.postal_code})
         .done(function(data, textStatus, jqXHR) {
             for (var i = 0, len = data.length; i < len; i++)
             {
-                articles += '<li><a target="blank" href="' + article.link + '">' + article.title + '</a></li>';
+                articles += '<li><a target="blank" href="' + data[0].link + '">' + data[0].title + '</a></li>';
             }
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
@@ -92,7 +91,9 @@ function addMarker(place)
     marker.addListener('click', function() {
         infowindow.open(map, marker);
     });
- }
+    
+    markers.push(marker);
+}
 
 /**
  * Configures application.
@@ -127,7 +128,7 @@ function configure()
         templates: {
             suggestion: Handlebars.compile(
                 "<div>" +
-                "<p>{{ suggestion.place_name }}, {{ suggestion.admin_name1 }}, {{ suggestion.postal_code }}</p>" +
+                "<p>{{ place_name }}, {{ admin_name1 }}, {{ postal_code }}</p>" +
                 "</div>"
             )
         }
@@ -168,7 +169,10 @@ function configure()
  */
 function removeMarkers()
 {
-    // TODO
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    markers = [];
 }
 
 /**
@@ -182,7 +186,6 @@ function search(query, syncResults, asyncResults)
     };
     $.getJSON(Flask.url_for("search"), parameters)
     .done(function(data, textStatus, jqXHR) {
-     
         // call typeahead's callback with search results (i.e., places)
         asyncResults(data);
     })
@@ -239,12 +242,11 @@ function update()
         q: $("#q").val(),
         sw: sw.lat() + "," + sw.lng()
     };
+
     $.getJSON(Flask.url_for("update"), parameters)
     .done(function(data, textStatus, jqXHR) {
-
        // remove old markers from map
        removeMarkers();
-
        // add new markers to map
        for (var i = 0; i < data.length; i++)
        {
