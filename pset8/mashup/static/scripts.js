@@ -73,23 +73,23 @@ function addMarker(place)
     
     $.getJSON(Flask.url_for("articles"), {geo: place.postal_code})
         .done(function(data, textStatus, jqXHR) {
-            for (var i = 0, len = data.length; i < len; i++)
-            {
-                articles += '<li><a target="blank" href="' + data[0].link + '">' + data[0].title + '</a></li>';
-            }
+            articles += "<ul>";
+            $.each(data, function(i, article) {
+                // remove "This RSS feed URL is deprecated" item
+                if (article.title !== "This RSS feed URL is deprecated") {
+                    articles += '<li><a target="blank" href="' + article.link + '">' + article.title + '</a></li>';
+                }
+            });
+            
+            articles += "</ul>";
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             // log error to browser's console
             console.log(errorThrown.toString());
         });
-
-    
-    var infowindow = new google.maps.InfoWindow({
-        content: "<ul>" + articles + "</ul>"
-    });
   
     marker.addListener('click', function() {
-        infowindow.open(map, marker);
+        showInfo(marker, articles);
     });
     
     markers.push(marker);
